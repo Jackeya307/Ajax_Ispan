@@ -1,0 +1,37 @@
+﻿@section Style {
+    <script src="~/js/travel.js"></script>
+    <style>
+        .flex {
+            height:300px;
+        }
+    </style>
+}
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    @* 動態產生的內容 *@
+</div>
+
+@section Scripts {
+    <script>
+        const table = document.querySelector('.row')
+        const section = spots.CommonFormat.Section
+        // < img src = "" style = "width: 24%" alt = "${imgdes}" >
+        for (let i = 0; i < section.length; i++) {
+            for (let c = 0; c < section[i].file.img.length; c++) {
+
+                let imgtext = section[i].file.img[c].text
+                let imgtitle = section[i].stitle
+                let imgAddress = section[i].address
+                table.innerHTML += `<div class="col">
+                                        <div class="card">
+                                            <img src="${imgtext}" class="card-img-top flex" >
+                                            <div class="card-body">
+                                                <h5 class="card-title">${imgtitle}</h5>
+                                                <p class="card-text">${imgAddress}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    `
+            }
+        }
+    </script>
+}

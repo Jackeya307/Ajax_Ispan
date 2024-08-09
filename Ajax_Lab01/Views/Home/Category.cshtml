@@ -1,0 +1,11 @@
+﻿@model IEnumerable<Ajax_Lab01.Models.Category>
+
+
+<ul>
+    @foreach(var item in Model) {
+
+        <li>
+            @Html.DisplayFor(modelItem => item.CategoryName)
+        </li>
+    }
+</ul>

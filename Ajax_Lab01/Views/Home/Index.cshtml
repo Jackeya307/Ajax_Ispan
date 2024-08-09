@@ -1,0 +1,117 @@
+﻿@model IQueryable<string?>
+@{
+    ViewData["Title"] = "Home Page";
+}
+<h1>上方homework為第一項作業</h1>
+<button id="btnMessage" class="btn btn-primary">Fetch</button>
+<div id="div1" class="alert alert-success mt-3" style="width:600px"></div>
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<ul>
+    @foreach(var item in Model) {
+        <li>
+            @item
+        </li>
+    }
+</ul>
+
+
+<table class="table" id="table">
+    <thead class="table-primary">
+        <tr>
+            <th>
+                姓名
+            </th>
+            <th>
+                年資
+            </th>
+            <th>
+                薪水
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+@section Scripts {
+    <script>
+        const emps = [{ "name": "Tom", "workYears": 3, "salary": 35000 },
+        { "name": "Jack", "workYears": 5, "salary": 40000 },
+        { "name": "Mary", "workYears": 7, "salary": 45000 }]
+
+        const datas = emps.map(emp => {
+            return `
+                                            <tr>
+                                                <td>${emp.name}</td>
+                                                <td>${emp.workYears}</td>
+                                                <td>${emp.salary}</td>
+                                            </tr>
+                                            `
+        })
+        const table = document.querySelector('#table>tbody')
+        table.innerHTML = datas.join("");
+    </script>
+    <script>
+        // setTimeout(() => {
+        //     console.log('a');
+        //     setTimeout(() => {
+        //         console.log('b');
+        //         setTimeout(() => {
+        //             console.log('c');
+        //         }, 1000);
+        //     }, 1000);
+        // }, 1000);
+
+
+        // function printSomething(data) {
+        //     const promise = new Promise((resolve, reject) => {
+        //         //非同步的程式碼
+        //         setTimeout(() => {
+        //             resolve(data)
+        //         }, 1000)
+        //     })
+        //     return promise
+        // }
+        // printSomething("A")
+        //    .then(data => {
+        //        console.log(data)
+        //        return printSomething("B")
+        //    })
+        //    .then(data => {
+        //         console.log(data)
+        //         return printSomething("C")
+        //     })
+        //     .then(data => {
+        //         console.log(data)
+        //         return printSomething("D")
+        //     })
+        //     .then(data => {
+        //         console.log(data)
+        //     })
+        //得到是一個Promise物件
+
+        const btnMessage = document.querySelector("#btnMessage");
+        const Message = document.querySelector("#div1");
+
+        
+        fetch('/home/h123')
+            .then(response => {
+                console.log(response)
+                return response.text()//得到又是一個Promise物件
+            })
+            .then(data => { ajaxFetch = data }) //Ajax, 您好
+
+        btnMessage.addEventListener('click', () => {
+            fetch('/home/h123')
+                .then(response => {
+                    return response.text()
+                })
+                .then(data => Message.innerHTML = data)
+        })
+
+    </script>
+}

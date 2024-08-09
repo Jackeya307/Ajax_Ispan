@@ -67,7 +67,7 @@ namespace Ajax_Lab01.Controllers {
                 Byte[]? memimg = Img.FileData;
                 return File(memimg,"image/jpeg");
             }
-            return NotFound("¨S·Ó¤ù");
+            return NotFound();
         }
 
         public IActionResult Category()

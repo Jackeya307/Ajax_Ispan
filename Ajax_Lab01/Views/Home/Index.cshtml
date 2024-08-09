@@ -19,14 +19,19 @@
     <div class="m-1 flex">
         <h3>鄉鎮區表</h3>
         <select id="selectCity1" onchange="RoadSelect()">
-        @foreach(var item in Model.Select(Address => Address.SiteId).Distinct()) {
+            @foreach(var item in Model.Select(Address => Address.SiteId).Distinct()) {
                 <option value="@item">@item</option>
-        }
+            }
         </select>
     </div>
 </div>
+<div class="">
+    <img id="myImg" class="mb-1 w-50" />
+    <p>
+        <input id="imgID" type="number" onkeydown="show(event)" />
+    </p>
 
-
+</div>
 <table class="table" id="table">
     <thead class="table-primary">
         <tr>
@@ -105,7 +110,7 @@
         // }
         const selRoad = document.querySelector('#selectCity1')
 
-        
+
         async function btnClick() {
             const Api = `@Url.Content("~/Home/Site")/${selCity.value}`
             // const response = await fetch(`/Home/Siteid/${selCity.value}`)
@@ -122,6 +127,24 @@
             const data = await response.json()
             const formattedData = data.join(' / '); // 將數組元素用/分隔
             context1.innerHTML = formattedData; // 將結果顯示在 `context1` 元素中
+        }
+
+        async function show(event) {
+            if (event.key === 'Enter') {
+                const id = document.querySelector('#imgID')
+                const Api = `@Url.Content("~/Home/Privacy/")${id.value}`
+                // const response = await fetch(`/Home/Siteid/${selCity.value}`)
+                const response = await fetch(Api)
+                if (!response.ok) {
+                    alert('無此圖片ID')
+                    return
+                }
+                const data = await response.blob()
+                const myImg = document.querySelector('#myImg')
+                // 將數組元素用/分隔
+                myImg.src = URL.createObjectURL(data) // 將結果顯示在 `context1` 元素中
+
+            }
         }
         // const btnMessage = document.querySelector("#btnMessage");
         // const Message = document.querySelector("#div1");

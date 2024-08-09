@@ -1,23 +1,30 @@
-﻿@model IQueryable<string?>
+﻿@model IEnumerable<Address>
 @{
     ViewData["Title"] = "Home Page";
 }
 <h1>上方homework為第一項作業</h1>
-<button id="btnMessage" class="btn btn-primary">Fetch</button>
-<div id="div1" class="alert alert-success mt-3" style="width:600px"></div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div>
+    <div class="m-1">
+        <h3>城市列表</h3>
+        <select id="selectCity" onchange="btnClick()">
+            @foreach(var item in Model.Select(Address => Address.City).Distinct()) {
+                <option value="@item">@item</option>
+            }
+        </select>
+    </div>
+
+    <div id="context1" class="mt-3 p-3 border rounded bg-light flex"></div>
+
+    <div class="m-1 flex">
+        <h3>鄉鎮區表</h3>
+        <select id="selectCity1" onchange="RoadSelect()">
+        @foreach(var item in Model.Select(Address => Address.SiteId).Distinct()) {
+                <option value="@item">@item</option>
+        }
+        </select>
+    </div>
 </div>
-
-<ul>
-    @foreach(var item in Model) {
-        <li>
-            @item
-        </li>
-    }
-</ul>
 
 
 <table class="table" id="table">
@@ -38,23 +45,6 @@
     </tbody>
 </table>
 @section Scripts {
-    <script>
-        const emps = [{ "name": "Tom", "workYears": 3, "salary": 35000 },
-        { "name": "Jack", "workYears": 5, "salary": 40000 },
-        { "name": "Mary", "workYears": 7, "salary": 45000 }]
-
-        const datas = emps.map(emp => {
-            return `
-                                            <tr>
-                                                <td>${emp.name}</td>
-                                                <td>${emp.workYears}</td>
-                                                <td>${emp.salary}</td>
-                                            </tr>
-                                            `
-        })
-        const table = document.querySelector('#table>tbody')
-        table.innerHTML = datas.join("");
-    </script>
     <script>
         // setTimeout(() => {
         //     console.log('a');
@@ -94,24 +84,63 @@
         //     })
         //得到是一個Promise物件
 
-        const btnMessage = document.querySelector("#btnMessage");
-        const Message = document.querySelector("#div1");
+        const context1 = document.querySelector('#context1');
+        // function btnClick(City) {
+        //     fetch(`/Home/Siteid/${City}`) // 發送 HTTP GET 請求
+        //         .then(response => response.json()) // 將響應體解析為 JSON 格式
+        //         .then(data => { // `data` 是解析後的 JSON 數據
+        //             const formattedData = data.join(' / '); // 將數組元素用/分隔
+        //             context1.innerHTML = formattedData; // 將結果顯示在 `context1` 元素中
+        //         });
+        // }
+        const selCity = document.querySelector('#selectCity')
+
+        // function btnClick() {
+        //     fetch(`/Home/Siteid/${selCity.value}`) // 發送 HTTP GET 請求
+        //         .then(response => response.json()) // 將響應體解析為 JSON 格式
+        //         .then(data => { // `data` 是解析後的 JSON 數據
+        //             const formattedData = data.join(' / '); // 將數組元素用/分隔
+        //             context1.innerHTML = formattedData; // 將結果顯示在 `context1` 元素中
+        //         });
+        // }
+        const selRoad = document.querySelector('#selectCity1')
 
         
-        fetch('/home/h123')
-            .then(response => {
-                console.log(response)
-                return response.text()//得到又是一個Promise物件
-            })
-            .then(data => { ajaxFetch = data }) //Ajax, 您好
+        async function btnClick() {
+            const Api = `@Url.Content("~/Home/Site")/${selCity.value}`
+            // const response = await fetch(`/Home/Siteid/${selCity.value}`)
+            const response = await fetch(Api)
+            const data = await response.json()
+            const formattedData = data.join(' / '); // 將數組元素用/分隔
+            context1.innerHTML = formattedData; // 將結果顯示在 `context1` 元素中
+        }
 
-        btnMessage.addEventListener('click', () => {
-            fetch('/home/h123')
-                .then(response => {
-                    return response.text()
-                })
-                .then(data => Message.innerHTML = data)
-        })
+        async function RoadSelect() {
+            const Api = `@Url.Content("~/Home/road")/${selRoad.value}`
+            // const response = await fetch(`/Home/Siteid/${selCity.value}`)
+            const response = await fetch(Api)
+            const data = await response.json()
+            const formattedData = data.join(' / '); // 將數組元素用/分隔
+            context1.innerHTML = formattedData; // 將結果顯示在 `context1` 元素中
+        }
+        // const btnMessage = document.querySelector("#btnMessage");
+        // const Message = document.querySelector("#div1");
+
+
+        // fetch('/home/h123')
+        //     .then(response => {
+        //         console.log(response)
+        //         return response.text()//得到又是一個Promise物件
+        //     })
+        //     .then(data => { ajaxFetch = data }) //Ajax, 您好
+
+        // btnMessage.addEventListener('click', () => {
+        //     fetch('/home/h123')
+        //         .then(response => {
+        //             return response.text()
+        //         })
+        //         .then(data => Message.innerHTML = data)
+        // })
 
     </script>
 }

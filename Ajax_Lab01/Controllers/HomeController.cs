@@ -19,27 +19,37 @@ namespace Ajax_Lab01.Controllers {
 
         public IActionResult Index()
         {
-            var b = _dbContext.Addresses.Select(s => s.SiteId).Distinct();
-            IQueryable<string?> c = _dbContext.Addresses.Select(s => s.City).Distinct().Concat(b)
-                ;
+            var c = _dbContext.Addresses;
             return View(c);
         }
 
         //todo 根據 city 讀出鄉鎮區(site_id)的資料
-        
-        public IActionResult site(string? city = "金門縣")
+
+        [HttpGet("/Home/Site/{City?}")] //
+        public IActionResult Site(string? City)
         {
-            if(city != null) {
-                IQueryable<string?> c = _dbContext.Addresses.Where(q => q.SiteId.Contains(city)).Select(s => s.SiteId).Distinct();
-                return Json(c.ToList());
+            //var c = _dbContext.Addresses.Where(Address => Address.SiteId.Contains(City)).Select(Address => Address.SiteId).Distinct().ToList();
+            var c = _dbContext.Addresses
+                .Where(Address => Address.SiteId.Contains(City))
+                .Select(Address => Address.SiteId)
+                .Distinct()
+                .ToList();
+            if(!c.Any()) {
+                return NotFound("查無相符的城市，故無法顯示其鄉鎮區");
             }
-            return NotFound();
+
+            return Json(c);
         }
         //todo 根據 site_id 讀出路名(road) 
-        public IActionResult road(string? site_id = "高雄市茄萣區")
+        [HttpGet("/Home/road/{site_id?}")] //
+        public IActionResult road(string? site_id)
         {
-            IQueryable<string?> c = _dbContext.Addresses.Where(q => q.Road.Contains(site_id)).Select(s => s.Road).Distinct();
-            return Json(c.ToList());
+            var c = _dbContext.Addresses
+                .Where(q => q.SiteId == site_id)
+                .Select(s => s.Road)
+                .Distinct().ToList();
+
+            return Json(c);
         }
 
 

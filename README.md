@@ -1,0 +1,2 @@
+位於Home資料的檢視Homework為作業1 讀取JSON中的圖片及資訊
+IspanLoginPratice.cshtml為作業3 上課時完成 未補全欄位

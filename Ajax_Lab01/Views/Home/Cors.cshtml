@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewData["Title"] = "Cors";
+}
+
+<h1>Cors</h1>
+
+@section Style{
+
+}
+
+@section Scripts{
+    <script>
+        (async() => {
+        const res = await fetch('https://localhost:7201/api/Shippers')
+        const data = await res.json()
+        console.log(data)
+        })()
+    </script>
+}

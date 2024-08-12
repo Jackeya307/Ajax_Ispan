@@ -1,0 +1,93 @@
+﻿@{
+    ViewData["Title"] = "travel";
+}
+
+<h1>travel</h1>
+
+@section Style {
+
+}
+
+<div class="row mb-3">
+    <div class="col-3"></div>
+    <div class="col-6">
+        <nav aria-label="...">
+            <ul class="pagination pagination-sm" id="ul1">
+            </ul>
+        </nav>
+    </div>
+    <div class="col-3">
+        <input type="search" placeholder="搜尋景點" id="inputSearch" class="form-control" />
+    </div>
+</div>
+<div class="row row-cols-1 row-cols-md-3 g-4" id="div1">
+</div>
+@section Scripts {
+    <script>
+        const searchData = {
+            "categoryId": 0,
+            "keyword": "",
+            "page": 10,
+            "pageSize": 9,
+            "sortBy": "",
+            "sortType": ""
+        }
+        const spotInfo = document.querySelector('#div1')
+        const ulPages = document.querySelector('#ul1')
+
+        const load = async () => {
+            const api = `@Url.Content("~/Home/spots")`
+            try {
+
+                const response = await fetch(api, {
+                    method: 'POST',
+                    body: JSON.stringify(searchData),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                if (!response.ok) {
+                    console.log("API出事了!!" + response.statusText)
+                    return;
+                }
+                const data = await response.json()
+                console.log(data.spotResult)
+                console.log(data.pages)
+                const spots = data.spotResult.map(spot => {
+                    const { address, spotTitle, spotDescription, spotImage, spotId } = spot
+                    return `
+                            <div class="col">
+                                <div class="card">
+                                    <img src="${spotImage}" class="card-img-top" alt="${spotTitle}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${spotTitle}</h5>
+                                        <p class="card-text">${spotDescription.length <= 100 ? spotDescription : spotDescription.substring(0, 100)}...</p>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    ${address}
+                                </div>
+                            </div>
+                           `
+                })
+                spotInfo.innerHTML = spots.join('')
+
+                let liPages = ""
+                for (let i = 1; i<= data.pages;i++)
+                    liPages += `
+                        <li class="page-item" onclick="clickPage(${i})">
+                            <a class="page-link">${i}
+                            </a>
+                        </li>`
+                ulPages.innerHTML = liPages
+            } catch (error) {
+                console.log("執行JS發生例外狀況!!! " + error.message)
+            }
+        }
+        load()
+        const clickPage = page => {
+            searchData.page = page
+            load()
+        }
+    </script>
+}

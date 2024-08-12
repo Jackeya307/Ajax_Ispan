@@ -1,8 +1,10 @@
 using Ajax_Lab01.Models;
+using Ajax_Lab01.Models.DTO;
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.EntityFrameworkCore;
 
 using System.Diagnostics;
 
@@ -52,7 +54,7 @@ namespace Ajax_Lab01.Controllers {
 
             return Json(c);
         }
-
+        public IActionResult Cors(){ return View(); }
 
         public IActionResult h123()
         {
@@ -86,12 +88,14 @@ namespace Ajax_Lab01.Controllers {
         }
         public IActionResult Register(userInfo p)
         {
-            string info = $"{p.userPhoto.Length} {p.userPhoto.FileName}";
+            //string info = $"{p.userPhoto.Length} {p.userPhoto.FileName}";
+
             string strPath = $"{_webHostEnvironment.WebRootPath}/images/{p.userPhoto.FileName}";
 
             using(var fileStream = new FileStream(strPath,FileMode.Create)) {
                 p.userPhoto.CopyTo(fileStream);
             }
+
             Byte[]? img = null;
             using(var memoryStream = new MemoryStream()) {
                 p.userPhoto.CopyTo(memoryStream);
@@ -116,7 +120,62 @@ namespace Ajax_Lab01.Controllers {
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        [HttpPost]
+        public IActionResult spots([FromBody] SearchDTO dTO)
+        {
+            try {
+
+                //根據分類編號讀取相關景點
+                var spot = dTO.categoryId == 0 ? _dbContext.SpotImagesSpots : _dbContext.SpotImagesSpots
+                    .Where(s => s.CategoryId == dTO.categoryId);
+
+                //關鍵字搜尋
+                if(!string.IsNullOrEmpty(dTO.keyword)) {
+                    spot = spot.Where(s => s.SpotTitle.Contains(dTO.keyword) || s.SpotDescription.Contains(dTO.keyword));
+                }
+
+                switch(dTO.sortBy) {
+                    case "spotTitle":
+                    spot = dTO.categoryId == 0 ? _dbContext.SpotImagesSpots : _dbContext.SpotImagesSpots.Where(s => s.CategoryId == dTO.categoryId).OrderByDescending(c => c.SpotTitle);
+                    break;
+                    case "categoryId":
+                    spot = dTO.categoryId == 0 ? _dbContext.SpotImagesSpots : _dbContext.SpotImagesSpots.Where(s => s.CategoryId == dTO.categoryId).OrderByDescending(c => c.CategoryId);
+                    break;
+                    default:
+                    spot = dTO.categoryId == 0 ? _dbContext.SpotImagesSpots : _dbContext.SpotImagesSpots.Where(s => s.CategoryId == dTO.categoryId);
+                    break;
+
+                }
+                //根據價錢搜尋
+                int Count = spot.Count();
+                int Pages = dTO.page;
+                int PageSize = dTO.pageSize;
+                int TotalPages = (int)Math.Ceiling((decimal)(Count / PageSize));
+                spot = spot.Skip((Pages - 1) * PageSize).Take(PageSize);
+                //根據日期區間搜尋
+                SpotPagingDTO PagingDTO = new SpotPagingDTO();
+                PagingDTO.Pages = Pages;
+                PagingDTO.SpotResult = spot.ToList();
+                return Json(PagingDTO);
+            }
+            catch(Exception ex) {
+                return NotFound(new {
+                    Error = "後端出事了!! "+ex.Message,
+                });
+            }
+        }
+
+        public IActionResult travel()
+        {
+            return View();
+        }
+
+
+
     }
+
+
 
     public class userInfo {
         public string userName {
